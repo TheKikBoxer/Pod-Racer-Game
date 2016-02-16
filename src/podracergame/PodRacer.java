@@ -57,6 +57,7 @@ private PodRacer pod;
     
     public void move() {
         x += getDx();
+        x += getDx();
         y += getDy();
 }
 
@@ -78,12 +79,12 @@ private PodRacer pod;
         int key = e.getKeyCode();
         
         if (key == KeyEvent.VK_LEFT) {
-            setDx(-2);
+            setDx(-30);
             setDy(0);
         }
         
         if (key == KeyEvent.VK_RIGHT) {
-            setDx(2);
+            setDx(30);
             setDy(0);
         }
         

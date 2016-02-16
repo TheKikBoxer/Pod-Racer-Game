@@ -35,16 +35,18 @@ class Tatooine extends Environment implements MouseMotionListener {
     private Grid grid;
     private PodRacer pod;
     private ArrayList<Barrier> myBarriers;
-    Image image1, image2, image;
+    Image backgroundImage1, backgroundImage2, podRacerImage, barrierImage;
     private Menu menu;
     private GameState state = GameState.MENU;
+    private AudioManager soundManager;
 
     public Tatooine() {
 
 //        grid = new Grid(100, 70, 10, 10, new Point(20, 20), new Color(100, 0, 100));
-        image1 = ResourceTools.loadImageFromResource("podracergame/sand.jpg");
-        image2 = ResourceTools.loadImageFromResource("podracergame/sand.jpg");
-        image = ResourceTools.loadImageFromFile("Podracer1.png");
+        backgroundImage1 = ResourceTools.loadImageFromResource("podracergame/sand.jpg");
+        backgroundImage2 = ResourceTools.loadImageFromResource("podracergame/sand.jpg");
+        podRacerImage = ResourceTools.loadImageFromFile("Podracer1.png");
+        barrierImage = ResourceTools.loadImageFromResource("podracergame/Rock.png");
 
 //      topImageY = this.getHeight() - this.image1.getHeight(null);
 
@@ -52,7 +54,14 @@ class Tatooine extends Environment implements MouseMotionListener {
         this.getActors().add(pod);
         state = GameState.MENU;
         this.addMouseMotionListener(this);//  addMouseListener(this);
-
+        
+        soundManager = AudioManager.getSoundManager();
+        
+        myBarriers = new ArrayList<>();
+        myBarriers.add(new Barrier(100, 200, Color.BLACK));
+        myBarriers.add(new Barrier(150, 250, Color.BLACK));
+        myBarriers.add(new Barrier(50, 50, Color.BLACK));
+        myBarriers.add(new Barrier(70, 290, Color.BLACK));
     }
 
     @Override
@@ -82,8 +91,6 @@ class Tatooine extends Environment implements MouseMotionListener {
 
     @Override
     public void keyPressedHandler(KeyEvent e) {
-//        System.out.println("KEY PRESS " + e.getKeyChar());
-//        System.out.println("KEY PRESS " + e.getKeyCode());
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
             pod.setDx(-6);
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -115,16 +122,10 @@ class Tatooine extends Environment implements MouseMotionListener {
     public void environmentMouseClicked(MouseEvent e) {
         if (state == GameState.MENU) {
             if (new Rectangle(PLAY_BUTTON_X, PLAY_BUTTON_Y, PLAY_BUTTON_WIDTH, PLAY_BUTTON_HEIGHT).contains(e.getPoint())) {
-//                System.out.println("WOOOOOOOOOT");
-                //play a sound
-                // start game
-            } else {
-//                play a yucky sound
-            }
-//            if (this.playButton.contains(e.getPoint())) {
-            state = GameState.GAME;
-//            }
 
+            } else {
+            }
+            state = GameState.GAME;
         }
     }
 
@@ -144,15 +145,13 @@ class Tatooine extends Environment implements MouseMotionListener {
         }
     }
 
-//    private Rectangle playButton = new Rectangle(Tatooine.WIDTH / 2 + 370, 300, 100, 50);
     @Override
     public void paintEnvironment(Graphics graphics) {
 
         if (state == GameState.MENU) {
-            //draw a bunch of menu stuff
 
-            graphics.drawImage(image1, 0, topImageY, this);
-            graphics.drawImage(image2, 0, topImageY - image2.getHeight(this), this);
+            graphics.drawImage(backgroundImage1, 0, topImageY, this);
+            graphics.drawImage(backgroundImage2, 0, topImageY - backgroundImage2.getHeight(this), this);
 
             Font fnt0 = new Font("arial", Font.BOLD, 50);
             graphics.setFont(fnt0);
@@ -160,29 +159,24 @@ class Tatooine extends Environment implements MouseMotionListener {
 
             Font fnt1 = new Font("arial", Font.BOLD, 70);
             graphics.setFont(fnt1);
-//            graphics.drawString("Start Game", playButton.x / 2, playButton.y / 2 + 185);
             graphics.drawString("Start Game", 100, 350);
             graphics.setColor(buttonColor);
             graphics.fill3DRect(PLAY_BUTTON_X, PLAY_BUTTON_Y, PLAY_BUTTON_WIDTH, PLAY_BUTTON_HEIGHT, true);
             
-            graphics.drawString("Pod Racers", 120, 400);
+            
 
         } else if (state == GameState.GAME) {
-            //draw a bunch of game stuff
-            if ((image1 != null) && (image2 != null)) {
-                graphics.drawImage(image1, 0, topImageY, this);
-                graphics.drawImage(image2, 0, topImageY - image2.getHeight(this), this);
+            if ((backgroundImage1 != null) && (backgroundImage2 != null)) {
+                graphics.drawImage(backgroundImage1, 0, topImageY, this);
+                graphics.drawImage(backgroundImage2, 0, topImageY - backgroundImage2.getHeight(this), this);
 
-            }
-
-            if (grid != null) {
-                grid.paintComponent(graphics);
             }
 
             if (myBarriers != null) {
                 for (int i = 0; i < myBarriers.size(); i++) {
                     myBarriers.get(i).draw(graphics);
                 }
+                //graphics.drawImage(barrierImage, 100, 100, this);
             }
 
             if (pod != null) {
@@ -190,12 +184,7 @@ class Tatooine extends Environment implements MouseMotionListener {
                 pod.draw(graphics);
             }
         }
-//
-//        if (State == STATE.GAME) {
-////          Put stuff here
-//        } else if (State == STATE.MENU) {
-//            menu.render(graphics);
-//        }
+
     }
 
 
@@ -230,22 +219,22 @@ class Tatooine extends Environment implements MouseMotionListener {
     int topImageY = 0;
 
     private void moveimages() {
-       
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        topImageY++;
-        if (image1 != null) {
+        for (int i = 0; i < 6; i++) {
+            topImageY++;
+            
+            for (Barrier barrier : myBarriers) {
+                barrier.move(0, 1);
+                if (barrier.getY() > this.getHeight()) {
+                    barrier.setY((int) (Math.random() * -100));
+                    barrier.setX((int) (Math.random() * 250));
+                }
+            }
+            
+        }
+
+        if (backgroundImage1 != null) {
             if (topImageY > this.getHeight()) {
-                topImageY = this.getHeight() - image1.getHeight(null);
+                topImageY = this.getHeight() - backgroundImage1.getHeight(null);
             }
         }
     
