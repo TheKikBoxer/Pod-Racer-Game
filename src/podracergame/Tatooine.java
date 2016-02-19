@@ -14,6 +14,7 @@ import java.awt.Color;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.BLUE;
 import static java.awt.Color.ORANGE;
+import static java.awt.Color.WHITE;
 import static java.awt.Color.black;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -39,13 +40,14 @@ class Tatooine extends Environment implements MouseMotionListener {
     private Menu menu;
     private GameState state = GameState.MENU;
     private AudioManager soundManager;
+    private int score;
 
     public Tatooine() {
 
 //        grid = new Grid(100, 70, 10, 10, new Point(20, 20), new Color(100, 0, 100));
         backgroundImage1 = ResourceTools.loadImageFromResource("podracergame/sand.jpg");
         backgroundImage2 = ResourceTools.loadImageFromResource("podracergame/sand.jpg");
-        podRacerImage = ResourceTools.loadImageFromFile("Podracer1.png");
+        podRacerImage = ResourceTools.loadImageFromFile("Podracer2.png");
         barrierImage = ResourceTools.loadImageFromResource("podracergame/Rock.png");
 
 //      topImageY = this.getHeight() - this.image1.getHeight(null);
@@ -79,6 +81,7 @@ class Tatooine extends Environment implements MouseMotionListener {
                 if (moveDelay >= moveDelayLimit) {
                     moveDelay = 0;
                     pod.move();
+                    setScore(getScore() + 1);
                 } else {
                     moveDelay++;
                 }
@@ -109,6 +112,8 @@ class Tatooine extends Environment implements MouseMotionListener {
             pod.setDx(0);
         }
     }
+    
+    
     
 
    
@@ -169,20 +174,42 @@ class Tatooine extends Environment implements MouseMotionListener {
             if ((backgroundImage1 != null) && (backgroundImage2 != null)) {
                 graphics.drawImage(backgroundImage1, 0, topImageY, this);
                 graphics.drawImage(backgroundImage2, 0, topImageY - backgroundImage2.getHeight(this), this);
-
-            }
-
-            if (myBarriers != null) {
-                for (int i = 0; i < myBarriers.size(); i++) {
-                    myBarriers.get(i).draw(graphics);
+                
+                if (myBarriers != null) {
+                    for (int i = 0; i < myBarriers.size(); i++) {
+                        myBarriers.get(i).draw(graphics);
+                    }
+                    //graphics.drawImage(barrierImage, 100, 100, this);
                 }
-                //graphics.drawImage(barrierImage, 100, 100, this);
+                
+                if (pod != null) {
+//                    graphics.drawImage(pod.getImage(), pod.getX(), pod.getY(), this);
+                    pod.draw(graphics);
+//                    Rectangle podHitbox = pod.getObjectBoundary();
+//                    graphics.drawRect(podHitbox.x, podHitbox.y, podHitbox.width, podHitbox.height);
+                }
+                Font fnt0 = new Font("arial", Font.BOLD, 50);
+                graphics.setFont(fnt0);
+                graphics.setColor(Color.white);
+                graphics.drawString(" " + getScore(), 15, 45);
+                
             }
+            
+            } else if (state == GameState.END) {
 
-            if (pod != null) {
-//                graphics.drawImage(pod.getImage(), pod.getX(), pod.getY(), this);
-                pod.draw(graphics);
-            }
+            graphics.drawImage(backgroundImage1, 0, 0 , this);
+
+            Font fnt1 = new Font("arial", Font.BOLD, 70);
+            graphics.setFont(fnt1);
+            graphics.setColor(WHITE);
+            graphics.drawString("GAME OVER", 100, 350);
+           
+            Font fnt2 = new Font("arial", Font.BOLD, 40);
+            graphics.setFont(fnt2);
+            graphics.setColor(WHITE);
+            graphics.drawString("SCORE : " + getScore(), 115, 400);
+
+            
         }
 
     }
@@ -209,24 +236,30 @@ class Tatooine extends Environment implements MouseMotionListener {
 //        return grid.getCellHeight();
     }
 
-    private void checkIntersections() {
-//check if the PodRacer is inside a barrier 
-//        if (myBarriers.contains(PodRacer.getLocation())) {
-//            System.out.println("HIT");
-//        }
+    public void checkIntersections() {
+        
+        if (state == GameState.GAME) {
+            if (pod != null && myBarriers != null) {
+                for (Barrier barrier : myBarriers) {
+                    if (barrier.getObjectBoundary().intersects(pod.getObjectBoundary())) {
+                        state = GameState.END;
+                    }
+                }
+            }
+        }
     }
 
     int topImageY = 0;
 
     private void moveimages() {
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 10; i++) {
             topImageY++;
             
             for (Barrier barrier : myBarriers) {
                 barrier.move(0, 1);
                 if (barrier.getY() > this.getHeight()) {
                     barrier.setY((int) (Math.random() * -100));
-                    barrier.setX((int) (Math.random() * 250));
+                    barrier.setX((int) (Math.random() * 750));
                 }
             }
             
@@ -238,6 +271,20 @@ class Tatooine extends Environment implements MouseMotionListener {
             }
         }
     
+    }
+
+    /**
+     * @return the score
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * @param score the score to set
+     */
+    public void setScore(int score) {
+        this.score = score;
     }
     
 

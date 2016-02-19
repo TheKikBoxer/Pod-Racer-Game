@@ -36,8 +36,8 @@ private Image image3;
     }
     
     private int x, y;
-    private int width = 30;
-    private int height = 40;
+    private int width = 100;
+    private int height = 100;
     
     private Color color;
 
@@ -73,5 +73,9 @@ private Image image3;
      */
     public void setY(int y) {
         this.y = y;
+    }
+    
+    public Rectangle getObjectBoundary() {
+        return new Rectangle(x + 20, y + 20, width - 40, height - 40);
     }
 }

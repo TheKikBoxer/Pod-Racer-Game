@@ -12,6 +12,7 @@ import images.ResourceTools;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 /**
@@ -20,6 +21,10 @@ import java.awt.event.KeyEvent;
  */
 
 public class PodRacer extends Actor {
+
+    static Object getLocation() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 private Image image;
 private boolean visible;
@@ -51,6 +56,11 @@ private PodRacer pod;
     
     public PodRacer(Point position, Velocity velocity) {
         super(position, velocity);
+    }
+    
+    @Override
+    public Rectangle getObjectBoundary() {
+        return new Rectangle(x, y, width, height);
     }
     
     

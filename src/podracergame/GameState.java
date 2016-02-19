@@ -10,5 +10,5 @@ package podracergame;
  * @author Liam
  */
 public enum GameState {
-    MENU, GAME
+    MENU, GAME, END
 }
